@@ -10,7 +10,8 @@
 // case, disable 2FA for this account first, or use the API Token version instead.
 //
 // Usage:
-//   1. cp .env.example .env   -> fill in CPANEL_HOST, CPANEL_USER, CPANEL_PASSWORD
+//   1. cp .env.example .env   -> fill in CPANEL_HOST, CPANEL_USER, CPANEL_PASSWORD,
+//                                 EMAIL_DOMAIN, EMAIL_PASSWORD
 //   2. cp accounts.example.csv accounts.csv -> fill in the list of emails to create
 //   3. npm install
 //   4. node create-emails.js accounts.csv --dry-run   (preview without executing)
@@ -27,24 +28,14 @@
 //     budi
 //     siti
 //
-//   domain, password, quota are set in the EMAIL_CONFIG block below (not in the CSV).
+//   domain & password come from .env (EMAIL_DOMAIN, EMAIL_PASSWORD); quota &
+//   send_welcome_email are set in the EMAIL_CONFIG block below (not in the CSV).
 
 import fs from "node:fs";
 import path from "node:path";
 import dotenv from "dotenv";
 
 dotenv.config();
-
-// =====================================================================
-//  EDIT HERE — applied to ALL emails created from accounts.csv
-// =====================================================================
-const EMAIL_CONFIG = {
-  domain: "warganegara.my.id",     // email domain, e.g. budi@<domain>
-  password: "lpZc1r3P@sUw0rd!",    // the same password for every account
-  quota: "1",                      // quota in MB per account (0 = unlimited)
-  send_welcome_email: "0",         // "1" = send welcome email, "0" = don't
-};
-// =====================================================================
 
 // ---------- Configuration from .env ----------
 const CPANEL_HOST = process.env.CPANEL_HOST;
@@ -53,6 +44,18 @@ const CPANEL_USER = process.env.CPANEL_USER;
 const CPANEL_PASSWORD = process.env.CPANEL_PASSWORD;
 const CPANEL_VERIFY_SSL = (process.env.CPANEL_VERIFY_SSL || "true").toLowerCase() !== "false";
 const REQUEST_DELAY_MS = Number(process.env.REQUEST_DELAY_MS || 500);
+
+// =====================================================================
+//  Email settings — applied to ALL emails created from accounts.csv.
+//  domain & password come from .env; the rest can be tweaked here.
+// =====================================================================
+const EMAIL_CONFIG = {
+  domain: process.env.EMAIL_DOMAIN,      // email domain, e.g. budi@<domain>  (set in .env)
+  password: process.env.EMAIL_PASSWORD,  // the same password for every account (set in .env)
+  quota: "1",                            // quota in MB per account (0 = unlimited)
+  send_welcome_email: "0",               // "1" = send welcome email, "0" = don't
+};
+// =====================================================================
 
 // ---------- CLI arguments ----------
 // You can pass more than one CSV file at once, e.g:
@@ -84,8 +87,8 @@ if (!CPANEL_VERIFY_SSL) {
 }
 
 // ---------- Validate EMAIL_CONFIG ----------
-if (!EMAIL_CONFIG.domain) fail("EMAIL_CONFIG.domain is not set in index.js");
-if (!EMAIL_CONFIG.password) fail("EMAIL_CONFIG.password is not set in index.js");
+if (!EMAIL_CONFIG.domain) fail("EMAIL_DOMAIN is not set in .env");
+if (!EMAIL_CONFIG.password) fail("EMAIL_PASSWORD is not set in .env");
 
 // ---------- Read all CSVs: list of usernames, one per line ----------
 // Merge the contents of every file given, drop duplicates (so we don't create the
