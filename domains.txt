@@ -1,9 +1,9 @@
-karyamu.my.id      accounts.csv-accounts_5.csv  (5 files)
-warganegara.my.id  accounts_6.csv-accounts_9.csv  (4 files)
-koneksinos.my.id   accounts_10.csv-accounts_14.csv  (5 files)
-slick.my.id        accounts_15.csv-accounts_19.csv  (5 files)
+karyamu.my.id      accounts.csv-accounts_5.csv  (5 files) -
+warganegara.my.id  accounts_6.csv-accounts_9.csv  (4 files) -
+koneksinos.my.id   accounts_10.csv-accounts_14.csv  (5 files) -
+slick.my.id        accounts_15.csv-accounts_19.csv  (5 files) -
 shrine.my.id       accounts_20.csv-accounts_24.csv  (5 files)
-pikes.my.id        accounts_25.csv-accounts_29.csv  (5 files)
+strikes.my.id        accounts_25.csv-accounts_29.csv  (5 files)
 cangkang.my.id     accounts_30.csv-accounts_34.csv  (5 files)
 blueco.my.id       accounts_35.csv-accounts_39.csv  (5 files)
 dario.my.id        accounts_40.csv-accounts_44.csv  (5 files)
