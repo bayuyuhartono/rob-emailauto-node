@@ -1,3 +1,9 @@
 karyamu 1-5
 warganegara 6-9
 koneksinos 10-14
+
+{name}{lastname}.{2randomnumber}@{domain}
+{name}{3randomalphabet}@{domain}
+{name}{2randomalphabet}.{2randomnumber}@{domain}
+{name}{1randomalphabet}.{2randomnumber}@{domain}
+{name}{lastname}.{1randomnumber}@{domain}

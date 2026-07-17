@@ -5,8 +5,9 @@
   "type": "module",
   "main": "create-emails.js",
   "scripts": {
-    "start": "node create-emails.js",
-    "dry-run": "node create-emails.js accounts.csv --dry-run"
+    "start": "node index.js",
+    "domain": "node run-domain.js",
+    "domain:dry": "node run-domain.js"
   },
   "dependencies": {
     "csv-parse": "^5.5.6",

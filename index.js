@@ -65,6 +65,10 @@ const csvPaths = args.filter((a) => !a.startsWith("--"));
 if (csvPaths.length === 0) csvPaths.push("accounts.csv");
 const isDryRun = args.includes("--dry-run");
 
+// Optional resume offset: --start=N skips the first N rows of the merged list.
+const startArg = args.find((a) => a.startsWith("--start="));
+const startIndex = startArg ? Math.max(0, parseInt(startArg.split("=")[1], 10) || 0) : 0;
+
 function fail(msg) {
   console.error(`\n❌ ${msg}\n`);
   process.exit(1);
@@ -220,13 +224,14 @@ async function main() {
   console.log(`Email domain  : ${EMAIL_CONFIG.domain}`);
   console.log(`CSV file(s)   : ${csvPaths.join(", ")}`);
   console.log(`Total username: ${usernames.length}${dupCount ? ` (dropped ${dupCount} duplicates)` : ""}`);
+  if (startIndex > 0) console.log(`Start from    : row ${startIndex + 1} (skipping the first ${startIndex})`);
   console.log(`Mode          : ${isDryRun ? "DRY RUN (no execution)" : "LIVE EXECUTION"}\n`);
 
   const results = [];
   let successCount = 0;
   let failCount = 0;
 
-  for (let i = 0; i < usernames.length; i++) {
+  for (let i = startIndex; i < usernames.length; i++) {
     const source = usernames[i].source;
     const row = { ...resolveRow(usernames[i].raw), source };
     const label = `${row.email_user}@${row.domain}`;
