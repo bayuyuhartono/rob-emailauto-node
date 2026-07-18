@@ -44,6 +44,9 @@ const CPANEL_USER = process.env.CPANEL_USER;
 const CPANEL_PASSWORD = process.env.CPANEL_PASSWORD;
 const CPANEL_VERIFY_SSL = (process.env.CPANEL_VERIFY_SSL || "true").toLowerCase() !== "false";
 const REQUEST_DELAY_MS = Number(process.env.REQUEST_DELAY_MS || 500);
+// Retry transient network errors (ECONNRESET etc.) before giving up on a row.
+const MAX_RETRIES = Number(process.env.MAX_RETRIES || 4);       // total attempts per account
+const RETRY_BASE_MS = Number(process.env.RETRY_BASE_MS || 1000); // backoff base (grows exponentially)
 
 // =====================================================================
 //  Email settings — applied to ALL emails created from accounts.csv.
@@ -136,8 +139,27 @@ function resolveRow(rawUser) {
   };
 }
 
-// ---------- Main function: call UAPI Email::add_pop directly ----------
-async function createEmailAccount(row) {
+// Transient errors worth retrying: connection resets, timeouts, temporary DNS, etc.
+// These are usually the server throttling us, not a real failure — a short wait fixes them.
+const RETRYABLE_CODES = new Set([
+  "ECONNRESET",
+  "ETIMEDOUT",
+  "EAI_AGAIN",
+  "ECONNREFUSED",
+  "EPIPE",
+  "UND_ERR_SOCKET",
+  "UND_ERR_CONNECT_TIMEOUT",
+]);
+
+function isRetryableError(err) {
+  const cause = err.cause;
+  if (cause && RETRYABLE_CODES.has(cause.code)) return true;
+  const msg = `${cause?.message || ""} ${err.message || ""}`.toLowerCase();
+  return /econnreset|timed?\s?out|terminated|socket|other side closed|reset/.test(msg);
+}
+
+// ---------- One request attempt (may throw on network error) ----------
+async function attemptCreateEmailAccount(row) {
   const { domain, email_user, password, quota, send_welcome_email } = row;
 
   const params = new URLSearchParams({
@@ -160,6 +182,13 @@ async function createEmailAccount(row) {
       Authorization: `Basic ${basicAuth}`,
     },
   });
+
+  // 429 (rate limited) and 5xx are transient — signal the retry loop to try again.
+  if (res.status === 429 || res.status >= 500) {
+    const e = new Error(`HTTP ${res.status} from server`);
+    e.retryableHttp = true;
+    throw e;
+  }
 
   const text = await res.text();
   let data;
@@ -188,6 +217,27 @@ async function createEmailAccount(row) {
 
   const errorMsg = Array.isArray(data.errors) ? data.errors.join("; ") : data.errors || "Failed, no error message from cPanel.";
   return { ok: false, message: errorMsg, raw: JSON.stringify(data) };
+}
+
+// ---------- Main function: retry transient failures with exponential backoff ----------
+async function createEmailAccount(row) {
+  const label = `${row.email_user}@${row.domain}`;
+  let lastErr;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await attemptCreateEmailAccount(row);
+    } catch (err) {
+      lastErr = err;
+      const retryable = err.retryableHttp || isRetryableError(err);
+      if (!retryable || attempt >= MAX_RETRIES) throw err;
+      // Exponential backoff with jitter: 1s, 2s, 4s, ... (+ up to 500ms random).
+      const wait = RETRY_BASE_MS * 2 ** (attempt - 1) + Math.floor(Math.random() * 500);
+      const reason = err.cause?.code || err.message;
+      console.log(`   ↻ retry ${attempt}/${MAX_RETRIES - 1} for ${label} in ${wait}ms (${reason})`);
+      await sleep(wait);
+    }
+  }
+  throw lastErr;
 }
 
 function sleep(ms) {

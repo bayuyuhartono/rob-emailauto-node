@@ -133,6 +133,34 @@ nohup node index.js accounts_15.csv > run.log 2>&1 &
 disown
 ```
 
+### Checking the list of running batches
+
+```bash
+# every active run — PID + full command (the CSV files tell you the domain)
+pgrep -af index.js
+
+# same, with CPU / memory / start time
+ps -ef | grep '[i]ndex.js'
+
+# all run logs, newest first
+ls -lt run-*.log
+
+# last few lines of each log (is it still going, or finished?)
+tail -n 3 run-*.log
+
+# progress per log
+for f in run-*.log; do echo "$f -> $(grep -c '✅ OK' "$f") OK"; done
+```
+
+A run is **finished** when its log ends with a `Done. Success: … | Failed/Skipped: …`
+line; if that line isn't there yet and the PID still shows in `pgrep`, it's still
+running. Stop one with `kill <pid>`.
+
+Running several domains at once is fine (they're separate processes with separate
+logs), but they all hit the same server — if you go parallel, raise `REQUEST_DELAY_MS`
+so the combined request rate doesn't trip rate limiting, and never run the **same**
+domain twice in parallel.
+
 ---
 
 ## 5. Output
