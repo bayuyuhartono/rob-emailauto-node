@@ -30,18 +30,15 @@ grinding.my.id     accounts_140.csv-accounts_144.csv  (5 files) /-
 sonofabit.my.id    accounts_145.csv-accounts_149.csv  (5 files) /-
 gajahbaru.my.id    accounts_150.csv-accounts_154.csv  (5 files) /-
 wicked.my.id       accounts_155.csv-accounts_159.csv  (5 files) /-
-cranks.my.id       accounts_160.csv-accounts_164.csv  (5 files) /
-obscure.my.id      accounts_165.csv-accounts_169.csv  (5 files) /
-autotheism.my.id   accounts_170.csv-accounts_174.csv  (5 files) /
-bringme.my.id      accounts_175.csv-accounts_179.csv  (5 files) /
-simpanse.my.id     accounts_180.csv-accounts_184.csv  (5 files) /
-youdont.my.id      accounts_185.csv-accounts_189.csv  (5 files) /
-klevertat.my.id    accounts_190.csv-accounts_194.csv  (5 files) /
-sinteyong.my.id    accounts_195.csv-accounts_199.csv  (5 files) /
-zoomakase.my.id    accounts_200.csv-accounts_204.csv  (5 files) /
-
-
-
+cranks.my.id       accounts_160.csv-accounts_164.csv  (5 files) /-
+obscure.my.id      accounts_165.csv-accounts_169.csv  (5 files) /-
+autotheism.my.id   accounts_170.csv-accounts_174.csv  (5 files) /-
+bringme.my.id      accounts_175.csv-accounts_179.csv  (5 files) /-
+simpanse.my.id     accounts_180.csv-accounts_184.csv  (5 files) /-
+youdont.my.id      accounts_185.csv-accounts_189.csv  (5 files) /-
+klevertat.my.id    accounts_190.csv-accounts_194.csv  (5 files) /-
+sinteyong.my.id    accounts_195.csv-accounts_199.csv  (5 files) /-
+zoomakase.my.id    accounts_200.csv-accounts_204.csv  (5 files) /-
 
 
 burzum.my.id       accounts_205.csv-accounts_209.csv  (5 files)
