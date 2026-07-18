@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node index.js",
     "domain": "node run-domain.js",
-    "domain:dry": "node run-domain.js"
+    "domain:dry": "node run-domain.js",
+    "status": "node status.js"
   },
   "dependencies": {
     "csv-parse": "^5.5.6",
